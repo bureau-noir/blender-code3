@@ -1,18 +1,26 @@
-import bpy
+import bpy  # type: ignore
 import os
 import json
 
-# === CONFIGURATION ===
-BASE_IMPORT = '/Users/PeteTurcotte/Dropbox/Cursor/blender-code3/Montreal_1772509/MDA-Nicolet_STR'
-INDEX_PATH = os.path.join(BASE_IMPORT, 'index.json')
-GLB_DIR = os.path.join(BASE_IMPORT, 'glb')
+# === CONFIGURATION HIÉRARCHIQUE ===
+BASE_LIBRARY = '/Users/PeteTurcotte/Dropbox/Cursor/blender-code3/data'
+PROJECT_FILTER = 'Montreal_1772509'  # Nom du projet
+BUILDING_FILTER = 'MDA-Nicolet'      # Nom du bâtiment
+DISCIPLINE_FILTER = 'STR'            # Discipline à importer (STR, MEP, ARC, ou None pour tout)
+STOREY_FILTER = 'NIVEAU 3'           # Niveau spécifique ou None pour tout
 
-# === FILTRES D'IMPORT ===
-# Laissez vide pour importer tous les niveaux, ou spécifiez un niveau
-STOREY_FILTER = 'NIVEAU 3'  # Exemple : importer seulement NIVEAU 3
-DISCIPLINE_FILTER = 'STR'    # Discipline à importer
+# === CHEMINS DYNAMIQUES ===
+PROJECT_PATH = os.path.join(BASE_LIBRARY, PROJECT_FILTER)
+BUILDING_DISCIPLINE_PATH = os.path.join(PROJECT_PATH, f"{BUILDING_FILTER}_{DISCIPLINE_FILTER}")
+INDEX_PATH = os.path.join(BUILDING_DISCIPLINE_PATH, 'index.json')
+GLB_DIR = os.path.join(BUILDING_DISCIPLINE_PATH, 'glb')
 
 # === LECTURE DE L'INDEX ===
+if not os.path.exists(INDEX_PATH):
+    print(f"❌ Fichier index non trouvé : {INDEX_PATH}")
+    print(f"   Vérifiez que le chemin existe : {BUILDING_DISCIPLINE_PATH}")
+    exit()
+
 with open(INDEX_PATH, 'r') as f:
     index = json.load(f)
 
@@ -31,15 +39,23 @@ for item in index:
     batch_map[key].append(item)
 
 print(f"📦 Import de {len(batch_map)} lots après filtrage...")
+print(f"   Projet: {PROJECT_FILTER}")
+print(f"   Bâtiment: {BUILDING_FILTER}")
+print(f"   Discipline: {DISCIPLINE_FILTER}")
+print(f"   Niveau: {STOREY_FILTER or 'Tous'}")
 
 for (discipline, storey, glb_path), items in batch_map.items():
-    # Créer la collection Discipline/Niveau si elle n'existe pas
-    coll_name = f"{discipline}/{storey}"
+    # Nettoyer le nom du niveau en enlevant 'IfcBuildingStorey/'
+    clean_storey = storey.replace('IfcBuildingStorey/', '').replace('/STR', '').replace('/INT', '')
+    
+    # Créer la collection BUILDING_FILTER/DISCIPLINE_FILTER/STOREY_FILTER
+    coll_name = f"{BUILDING_FILTER}/{discipline}/{clean_storey}"
     if coll_name not in bpy.data.collections:
         new_coll = bpy.data.collections.new(coll_name)
         bpy.context.scene.collection.children.link(new_coll)
     else:
         new_coll = bpy.data.collections[coll_name]
+    
     # Importer le .glb batch
     if not os.path.isabs(glb_path):
         glb_path = os.path.join(GLB_DIR, os.path.basename(glb_path))

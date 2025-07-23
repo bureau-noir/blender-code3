@@ -3,14 +3,14 @@
 
 ## Background and Motivation
 
-L'objectif est de créer un **système de décomposition et reparamétrage** de projets BIM de référence pour développer une **solution modulaire personnalisée**. Ce projet vise à :
+Le projet blender-code3 vise à créer un système de gestion et d'analyse de données BIM (Building Information Modeling) dans Blender. L'objectif principal est de développer des outils pour extraire, organiser et importer des données IFC de manière structurée et paramétrique.
 
-- **Extraire et analyser** des projets BIM publics de référence
-- **Identifier les dénominateurs communs** structurels et systémiques
-- **Décomposer les éléments** en composants paramétriques modulaires
-- **Créer une bibliothèque d'éléments** reparamétrables selon des contraintes spécifiques
-- **Développer un système modulaire** intégrant structure, MEP (plomberie, électricité, HVAC) et architecture
-- **Recomposer des solutions personnalisées** en respectant les contraintes modulaires
+**Nouvelle nomenclature hiérarchique implémentée :**
+- Structure de dossiers : `PROJECT/BUILDING/DISCIPLINE/NIVEAU`
+- Noms de collections : `BUILDING_FILTER/DISCIPLINE_FILTER/STOREY_FILTER`
+- Filtres configurables : PROJECT_FILTER, BUILDING_FILTER, DISCIPLINE_FILTER, STOREY_FILTER
+
+Cette nomenclature permet une navigation intuitive et cohérente dans la bibliothèque BIM, facilitant l'import sélectif de projets, bâtiments, disciplines et niveaux spécifiques.
 
 L'environnement doit être itératif, évolutif et modulaire pour exploiter le plein potentiel de Blender, IFCOpenShell et Python.
 
@@ -66,27 +66,15 @@ L'environnement doit être itératif, évolutif et modulaire pour exploiter le p
 
 ## Project Status Board
 
-### En Cours
-- [ ] Vérification de l'environnement de développement
-
-### À Faire
-- [ ] Ouverture et analyse du fichier IFC original
-- [ ] Développement d'extracteurs IFC spécialisés
-- [ ] Création du système de bibliothèque paramétrique
-- [ ] Implémentation du moteur de reparamétrage
-- [ ] Développement des outils de validation d'assemblages
-
-### Terminé
-- [x] Test de communication Blender MCP
-- [x] Analyse de la scène IFC existante
-- [x] Installation d'IFC-OpenShell (version 0.8.2)
-- [x] Test d'intégration IFC-OpenShell avec Blender
-- [x] Création de la structure de base du projet BIM
-- [x] Développement des modules d'analyse IFC, spatial et paramétrique
-- [x] Tests de base des fonctionnalités BIM
-- [x] Ouverture et analyse du fichier IFC de structure (6110 éléments)
-- [x] Identification des dénominateurs communs structurels
-- [x] Création de la bibliothèque paramétrique structurelle (JSON)
+- [x] Initialiser le dépôt git local
+- [x] Faire le premier commit
+- [x] Installer GitHub CLI (gh)
+- [x] Authentifier l'utilisateur avec gh
+- [x] Créer le dépôt privé "blender-code3" sur GitHub
+- [x] Lier le dépôt local au dépôt distant et pousser le code
+- [x] Modifier sq_extractor.py pour nouvelle nomenclature hiérarchique
+- [x] Modifier sq_import.py pour utiliser BUILDING/DISCIPLINE/STOREY
+- [x] Implémenter les filtres configurables (PROJECT_FILTER, BUILDING_FILTER, etc.)
 
 ## Current Status / Progress Tracking
 
@@ -109,26 +97,9 @@ L'environnement doit être itératif, évolutif et modulaire pour exploiter le p
 
 ## Executor's Feedback or Assistance Requests
 
-**Rapport de succès** :
-✅ **Infrastructure BIM complètement opérationnelle**
-- IFC-OpenShell installé et intégré
-- Modules d'analyse développés et testés
-- Démonstration complète réussie avec 68 objets IFC analysés
-- Génération paramétrique fonctionnelle
-- Analyse des connexions spatiales (4556 connexions détectées)
+Toutes les étapes de sauvegarde sur GitHub ont été réalisées avec succès. Le projet est maintenant disponible ici : https://github.com/bureau-noir/blender-code3
 
-**Nouvel objectif identifié** :
-🎯 **Système de décomposition et reparamétrage modulaire**
-- Extraction de projets BIM de référence
-- Identification des dénominateurs communs structurels et systémiques
-- Création d'une bibliothèque d'éléments paramétriques
-- Développement d'un système modulaire intégrant structure, MEP et architecture
-- Recomposition de solutions personnalisées selon contraintes spécifiques
-
-**Questions pour la suite** :
-1. Êtes-vous prêt à ouvrir le fichier IFC original pour analyse complète ?
-2. Quels sont vos critères prioritaires pour le reparamétrage (performance, coût, contraintes spatiales) ?
-3. Souhaitez-vous commencer par un système spécifique (structure, MEP, architecture) ?
+Merci de vérifier sur GitHub que tout est conforme à tes attentes. Si tu veux ajouter un README, une licence ou d'autres fichiers, préviens-moi !
 
 ## Lessons
 
