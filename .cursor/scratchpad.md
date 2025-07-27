@@ -75,31 +75,33 @@ L'environnement doit être itératif, évolutif et modulaire pour exploiter le p
 - [x] Modifier sq_extractor.py pour nouvelle nomenclature hiérarchique
 - [x] Modifier sq_import.py pour utiliser BUILDING/DISCIPLINE/STOREY
 - [x] Implémenter les filtres configurables (PROJECT_FILTER, BUILDING_FILTER, etc.)
+- [x] Simplifier la structure GLB (suppression du sous-dossier inutile)
+- [x] Corriger le nettoyage des noms d'étages (suppression IfcBuildingStorey/)
+- [x] Sauvegarder les modifications sur GitHub
 
 ## Current Status / Progress Tracking
 
-**État Actuel** : Bibliothèque structurelle créée et opérationnelle
-- Communication Blender MCP : ✅ Fonctionnelle
-- IFC-OpenShell : ✅ Installé (version 0.8.2)
-- Intégration IFC-Blender : ✅ Testée avec succès
-- Modules BIM : ✅ Développés (analyseur IFC, outils spatiaux, générateur paramétrique)
-- Fichier IFC Structure : ✅ Analysé (6110 éléments structurels)
-- Dénominateurs communs : ✅ Identifiés (colonnes, poutres, dalles, murs, fondations)
-- Bibliothèque paramétrique : ✅ Créée (structural_library.json)
-- Prêt pour l'analyse des autres systèmes : ✅
+✅ **Système d'extraction/import optimisé** :
+- Structure de dossiers simplifiée : `PROJECT/BUILDING_DISCIPLINE/`
+- Fichiers GLB directement dans `glb/` sans sous-dossier
+- Noms d'étages nettoyés correctement
+- Filtres configurables pour extraction sélective
+- Cohérence entre sq_extractor.py et sq_import.py
 
-**Prochaines Étapes** :
-1. Ouverture du fichier IFC original pour analyse complète
-2. Développement d'extracteurs spécialisés par système (Structure, MEP, Architecture)
-3. Création de la structure de bibliothèque paramétrique (JSON/YAML)
-4. Implémentation du système de reparamétrage intelligent
-5. Développement des outils de validation d'assemblages modulaires IFC
+✅ **Sauvegarde GitHub** :
+- Commit : "Fix: Correction du nettoyage des noms d'étages et simplification de la structure GLB"
+- Push réussi vers https://github.com/bureau-noir/blender-code3
 
 ## Executor's Feedback or Assistance Requests
 
-Toutes les étapes de sauvegarde sur GitHub ont été réalisées avec succès. Le projet est maintenant disponible ici : https://github.com/bureau-noir/blender-code3
+Sauvegarde GitHub terminée avec succès ! Le projet est maintenant à jour avec toutes les améliorations récentes :
 
-Merci de vérifier sur GitHub que tout est conforme à tes attentes. Si tu veux ajouter un README, une licence ou d'autres fichiers, préviens-moi !
+- **Structure GLB simplifiée** : Fichiers directement dans `glb/` 
+- **Noms d'étages corrigés** : Suppression de `IfcBuildingStorey/`
+- **Filtres configurables** : PROJECT_FILTER, BUILDING_FILTER, DISCIPLINE_FILTER
+- **Cohérence maintenue** : sq_extractor.py et sq_import.py parfaitement alignés
+
+Le système est prêt pour l'analyse holistique des patterns et la création de modules volumétriques !
 
 ## Lessons
 
