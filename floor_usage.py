@@ -2,12 +2,37 @@ import bpy
 import bmesh
 from mathutils import Vector
 import sqlite3
+import os
+
+# === CONFIGURATION HIÉRARCHIQUE ===
+PROJECT_FILTER = 'Montreal_1772509'  # Nom du projet
+BUILDING_FILTER = 'MDA-Nicolet'      # Nom du bâtiment
+DISCIPLINE_FILTER = 'INT'            # Discipline à analyser (STR, INT, MEP, ARC, ou None pour tout)
+STOREY_FILTER = 'NIVEAU 5'           # Niveau spécifique à analyser
+
+# === CHEMINS DYNAMIQUES ===
+BASE_LIBRARY = '/Users/PeteTurcotte/Dropbox/Cursor/blender-code3/data'
+PROJECT_PATH = os.path.join(BASE_LIBRARY, PROJECT_FILTER)
+BUILDING_DISCIPLINE_PATH = os.path.join(PROJECT_PATH, f"{BUILDING_FILTER}_{DISCIPLINE_FILTER}")
+SQLITE_PATH = os.path.join(BUILDING_DISCIPLINE_PATH, 'bim_library.sqlite')
 
 def analyze_floor_usage():
     """Analyse les utilisations du sol et crée une visualisation basée sur la géométrie réelle"""
     
-    print("🏠 ANALYSE DES UTILISATIONS DU SOL - NIVEAU 5")
+    print("🏠 ANALYSE DES UTILISATIONS DU SOL")
     print("=" * 60)
+    print(f"   Projet: {PROJECT_FILTER}")
+    print(f"   Bâtiment: {BUILDING_FILTER}")
+    print(f"   Discipline: {DISCIPLINE_FILTER}")
+    print(f"   Niveau: {STOREY_FILTER}")
+    print(f"   Base SQLite: {SQLITE_PATH}")
+    print("=" * 60)
+    
+    # Vérifier que la base SQLite existe
+    if not os.path.exists(SQLITE_PATH):
+        print(f"❌ Base SQLite non trouvée: {SQLITE_PATH}")
+        print(f"   Vérifiez que le chemin existe: {BUILDING_DISCIPLINE_PATH}")
+        return None
     
     # Obtenir les données depuis SQLite
     usage_data = get_floor_usage_data()
@@ -22,17 +47,17 @@ def get_floor_usage_data():
     """Récupère les données d'utilisation du sol depuis SQLite"""
     
     try:
-        conn = sqlite3.connect('bim_library.sqlite')
+        conn = sqlite3.connect(SQLITE_PATH)
         cursor = conn.cursor()
         
-        # Récupérer les éléments du NIVEAU 5
+        # Récupérer les éléments du niveau spécifié
         cursor.execute("""
             SELECT name, type, COUNT(*) as count 
             FROM ifc_element 
-            WHERE storey = 'NIVEAU 5' 
+            WHERE storey = ? 
             GROUP BY name, type 
             ORDER BY count DESC
-        """)
+        """, (STOREY_FILTER,))
         
         results = cursor.fetchall()
         conn.close()
@@ -105,37 +130,39 @@ def create_realistic_floor_usage_visualization(usage_data):
     print(f"\n🎨 CRÉATION DE LA VISUALISATION RÉALISTE AVEC SOUS-COLLECTIONS")
     
     # Supprimer collection existante
-    if 'FLOOR_USAGE_VISUALIZATION' in bpy.data.collections:
-        bpy.data.collections.remove(bpy.data.collections['FLOOR_USAGE_VISUALIZATION'])
+    if 'FLOOR_USAGE' in bpy.data.collections:
+        bpy.data.collections.remove(bpy.data.collections['FLOOR_USAGE'])
     
     # Créer collection principale
-    main_collection = bpy.data.collections.new('FLOOR_USAGE_VISUALIZATION')
+    main_collection = bpy.data.collections.new('FLOOR_USAGE')
     bpy.context.scene.collection.children.link(main_collection)
     
-    # Trouver la collection cible (INT/NIVEAU 5)
+    # Trouver la collection cible basée sur les filtres
     target_collection = None
     for collection in bpy.data.collections:
-        if 'MDA-Nicolet' in collection.name and 'INT' in collection.name and 'NIVEAU 5' in collection.name:
+        if (BUILDING_FILTER in collection.name and 
+            DISCIPLINE_FILTER in collection.name and 
+            STOREY_FILTER in collection.name):
             target_collection = collection
             break
     
     if not target_collection:
-        print("❌ Collection MDA-Nicolet/INT/NIVEAU 5 non trouvée")
+        print(f"❌ Collection {BUILDING_FILTER}/{DISCIPLINE_FILTER}/{STOREY_FILTER} non trouvée")
         return
     
     print(f"   Collection utilisée: {target_collection.name}")
     
     # Définir les couleurs pour toutes les catégories
     category_colors = {
-        'CHAMBRE': (0.1, 0.8, 0.1, 1.0),  # Vert
-        'SALLE_DE_BAIN': (0.8, 0.1, 0.8, 1.0),  # Violet
-        'CUISINE': (1.0, 0.5, 0.0, 1.0),  # Orange
-        'SALON': (0.1, 0.1, 0.8, 1.0),  # Bleu
-        'FOYER': (0.1, 0.8, 0.8, 1.0),  # Cyan
-        'BUREAU': (0.8, 0.8, 0.1, 1.0),  # Jaune
-        'CORRIDOR': (0.8, 0.4, 0.1, 1.0),  # Orange foncé
-        'RANGEMENT': (0.6, 0.6, 0.6, 1.0),  # Gris
-        'ESPACE_GENERAL': (0.5, 0.5, 0.5, 1.0)  # Gris clair
+        'CHAMBRE': {'count': 0, 'color': (0.1, 0.8, 0.1, 1.0)},
+        'SALLE_DE_BAIN': {'count': 0, 'color': (0.8, 0.1, 0.8, 1.0)},
+        'CUISINE': {'count': 0, 'color': (1.0, 0.5, 0.0, 1.0)},
+        'SALON': {'count': 0, 'color': (0.1, 0.1, 0.8, 1.0)},
+        'FOYER': {'count': 0, 'color': (0.1, 0.8, 0.8, 1.0)},
+        'BUREAU': {'count': 0, 'color': (0.8, 0.8, 0.1, 1.0)},
+        'CORRIDOR': {'count': 0, 'color': (0.8, 0.4, 0.1, 1.0)},
+        'RANGEMENT': {'count': 0, 'color': (0.6, 0.6, 0.6, 1.0)},
+        'ESPACE_GENERAL': {'count': 0, 'color': (0.5, 0.5, 0.5, 1.0)}
     }
     
     # Créer les sous-collections
@@ -178,7 +205,7 @@ def create_realistic_floor_usage_visualization(usage_data):
     
     print(f"   {processed_objects} objets traités")
     print(f"   {filtered_objects} objets filtrés (non pertinents)")
-    print(f"   Collection 'FLOOR_USAGE_VISUALIZATION' créée avec {len(subcollections)} sous-collections")
+    print(f"   Collection 'FLOOR_USAGE' créée avec {len(subcollections)} sous-collections")
 
 def categorize_element_with_subcategory(name):
     """Catégorise un élément selon son nom avec sous-catégorie"""
